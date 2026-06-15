@@ -1,68 +1,182 @@
-import { Lock, Mail, User2Icon } from 'lucide-react'
-import React from 'react'
-import api from '../configs/api'
-import { useDispatch } from 'react-redux'
-import { login } from '../app/features/authSlice'
-import toast from 'react-hot-toast'
+import React, { useState } from "react";
+import api from "../configs/api";
+import { useDispatch } from "react-redux";
+import { login } from "../app/features/authSlice";
+import toast from "react-hot-toast";
 
 const Login = () => {
+  const dispatch = useDispatch();
 
-    const dispatch = useDispatch()
-  const query = new URLSearchParams(window.location.search)
-  const urlState = query.get('state')
-  const [state, setState] = React.useState(urlState || "login")
+  const query = new URLSearchParams(window.location.search);
+  const urlState = query.get("state");
 
-    const [formData, setFormData] = React.useState({
-        name: '',
-        email: '',
-        password: ''
-    })
+  const [state, setState] = useState(urlState || "login");
+  const [loading, setLoading] = useState(false);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        try {
-            const { data } = await api.post(`/api/users/${state}`, formData)
-            dispatch(login(data))
-            localStorage.setItem('token', data.token)
-            toast.success(data.message)
-        } catch (error) {
-            toast(error?.response?.data?.message || error.message)
-        }
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+
+  const handleChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      setLoading(true);
+
+      const { data } = await api.post(
+        `/api/users/${state}`,
+        formData
+      );
+
+      dispatch(login(data));
+      localStorage.setItem("token", data.token);
+
+      toast.success(data.message);
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message ||
+          error.message
+      );
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const handleChange = (e) => {
-        const { name, value } = e.target
-        setFormData(prev => ({ ...prev, [name]: value }))
-    }
   return (
-    <div className='flex items-center justify-center min-h-screen bg-gray-50'>
-      <form onSubmit={handleSubmit} className="sm:w-[350px] w-full text-center border border-gray-300/60 rounded-2xl px-8 bg-white">
-                <h1 className="text-gray-900 text-3xl mt-10 font-medium">{state === "login" ? "Login" : "Sign up"}</h1>
-                <p className="text-gray-500 text-sm mt-2">Please {state} to continue</p>
-                {state !== "login" && (
-                    <div className="flex items-center mt-6 w-full bg-white border border-gray-300/80 h-12 rounded-full overflow-hidden pl-6 gap-2">
-                        <User2Icon size={16} color='#6B7280'/>
-                        <input type="text" name="name" placeholder="Name" className="border-none outline-none ring-0" value={formData.name} onChange={handleChange} required />
-                    </div>
-                )}
-                <div className="flex items-center w-full mt-4 bg-white border border-gray-300/80 h-12 rounded-full overflow-hidden pl-6 gap-2">
-                    <Mail size={13} color="#6B7280" />
-                    <input type="email" name="email" placeholder="Email id" className="border-none outline-none ring-0" value={formData.email} onChange={handleChange} required />
-                </div>
-                <div className="flex items-center mt-4 w-full bg-white border border-gray-300/80 h-12 rounded-full overflow-hidden pl-6 gap-2">
-                    <Lock size={13} color="#6B7280"/>
-                    <input type="password" name="password" placeholder="Password" className="border-none outline-none ring-0" value={formData.password} onChange={handleChange} required />
-                </div>
-                <div className="mt-4 text-left text-green-500">
-                    <button className="text-sm" type="reset">Forget password?</button>
-                </div>
-                <button type="submit" className="mt-2 w-full h-11 rounded-full text-white bg-green-500 hover:opacity-90 transition-opacity">
-                    {state === "login" ? "Login" : "Sign up"}
-                </button>
-                <p onClick={() => setState(prev => prev === "login" ? "register" : "login")} className="text-gray-500 text-sm mt-3 mb-11">{state === "login" ? "Don't have an account?" : "Already have an account?"} <a href="#" className="text-green-500 hover:underline">click here</a></p>
-            </form>
-    </div>
-  )
-}
+    <div className="min-h-screen bg-slate-100 flex items-center justify-center px-4">
+      <div className="w-full max-w-md">
 
-export default Login
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-slate-900">
+            Resume Builder
+          </h1>
+
+          <p className="text-slate-500 mt-2">
+            Create professional ATS-friendly resumes
+          </p>
+        </div>
+
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white rounded-3xl shadow-lg border border-slate-200 p-8"
+        >
+          <h2 className="text-2xl font-bold text-slate-900 text-center">
+            {state === "login"
+              ? "Welcome Back"
+              : "Create Account"}
+          </h2>
+
+          <p className="text-slate-500 text-center mt-2 mb-8">
+            {state === "login"
+              ? "Login to continue"
+              : "Create your account to get started"}
+          </p>
+
+          {state !== "login" && (
+            <div className="mb-5">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Full Name
+              </label>
+
+              <input
+                type="text"
+                name="name"
+                placeholder="Enter your full name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                className="w-full h-12 px-4 rounded-xl border border-slate-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all"
+              />
+            </div>
+          )}
+
+          <div className="mb-5">
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Email Address
+            </label>
+
+            <input
+              type="email"
+              name="email"
+              placeholder="Enter your email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              className="w-full h-12 px-4 rounded-xl border border-slate-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Password
+            </label>
+
+            <input
+              type="password"
+              name="password"
+              placeholder="Enter your password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className="w-full h-12 px-4 rounded-xl border border-slate-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all"
+            />
+          </div>
+
+          <div className="mt-3 text-right">
+            <button
+              type="button"
+              className="text-sm text-indigo-600 hover:underline"
+            >
+              Forgot Password?
+            </button>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full h-12 mt-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition-all disabled:opacity-70"
+          >
+            {loading
+              ? "Please wait..."
+              : state === "login"
+              ? "Login"
+              : "Create Account"}
+          </button>
+
+          <div className="mt-6 text-center text-sm text-slate-500">
+            {state === "login"
+              ? "Don't have an account?"
+              : "Already have an account?"}
+
+            <button
+              type="button"
+              onClick={() =>
+                setState(
+                  state === "login"
+                    ? "register"
+                    : "login"
+                )
+              }
+              className="ml-2 text-indigo-600 font-semibold hover:underline"
+            >
+              {state === "login"
+                ? "Sign Up"
+                : "Login"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
