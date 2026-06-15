@@ -16,7 +16,6 @@ import pdfToText from "react-pdftotext";
 
 const Dashboard = () => {
   const { token } = useSelector((state) => state.auth);
-
   const navigate = useNavigate();
 
   const [showCreateResume, setShowCreateResume] = useState(false);
@@ -33,7 +32,7 @@ const Dashboard = () => {
       const { data } = await api.post(
         "/api/resumes/create",
         { title },
-        { headers: { Authorization: token } },
+        { headers: { Authorization: token } }
       );
 
       setShowCreateResume(false);
@@ -56,7 +55,7 @@ const Dashboard = () => {
       const { data } = await api.post(
         "/api/ai/upload-resume",
         { title, resumeText },
-        { headers: { Authorization: token } },
+        { headers: { Authorization: token } }
       );
 
       navigate(`/app/builder/${data.resumeId}`);
@@ -68,175 +67,166 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-10">
-      <div className="mb-10">
-        <h1 className="text-4xl font-bold">Resume Dashboard</h1>
+    <div className="min-h-screen bg-slate-50">
 
-        <p className="text-slate-500 mt-2">Create, Upload and Manage Resumes</p>
-      </div>
+      <div className="max-w-6xl mx-auto px-6 py-10">
 
-      <div className="grid md:grid-cols-3 gap-8">
-        <button
-          onClick={() => setShowCreateResume(true)}
-          className="bg-white border rounded-3xl h-64 flex flex-col items-center justify-center gap-4 hover:shadow-xl transition-all"
-        >
-          <PlusIcon className="size-16 text-indigo-600" />
-          <p className="font-semibold text-lg">Create Resume</p>
-        </button>
+        {/* HEADER */}
+        <div className="mb-10">
+          <h1 className="text-4xl font-bold text-slate-900">
+            Resume Dashboard
+          </h1>
+          <p className="text-slate-500 mt-2">
+            Create, upload and manage your resumes with AI assistance
+          </p>
+        </div>
 
-        <button
-          onClick={() => setShowUploadResume(true)}
-          className="bg-white border rounded-3xl h-64 flex flex-col items-center justify-center gap-4 hover:shadow-xl transition-all"
-        >
-          <UploadCloudIcon className="size-16 text-purple-600" />
-          <p className="font-semibold text-lg">Upload Existing Resume</p>
-        </button>
+        {/* CARDS */}
+        <div className="grid md:grid-cols-3 gap-8">
 
-        <button
-          onClick={() => navigate("/app/my-resumes")}
-          className="bg-white border rounded-3xl h-64 flex flex-col items-center justify-center gap-4 hover:shadow-xl transition-all"
-        >
-          <FilePenLineIcon className="size-16 text-green-600" />
-          <p className="font-semibold text-lg">My Resumes</p>
-        </button>
-      </div>
+          {/* CREATE */}
+          <button
+            onClick={() => setShowCreateResume(true)}
+            className="bg-white border border-slate-200 rounded-2xl h-60 flex flex-col items-center justify-center gap-4 shadow-sm hover:shadow-xl hover:-translate-y-1 transition"
+          >
+            <PlusIcon className="size-14 text-indigo-600" />
+            <p className="font-semibold text-lg">Create Resume</p>
+          </button>
 
-      {/* Create Resume Modal */}
+          {/* UPLOAD */}
+          <button
+            onClick={() => setShowUploadResume(true)}
+            className="bg-white border border-slate-200 rounded-2xl h-60 flex flex-col items-center justify-center gap-4 shadow-sm hover:shadow-xl hover:-translate-y-1 transition"
+          >
+            <UploadCloudIcon className="size-14 text-purple-600" />
+            <p className="font-semibold text-lg">Upload Resume</p>
+          </button>
 
-      {showCreateResume && (
-        <form
-          onSubmit={createResume}
-          className="fixed inset-0 bg-black/60 flex justify-center items-center"
-        >
-          <div className="bg-white p-6 rounded-xl w-[400px] relative">
-            <h2 className="text-xl font-bold mb-4">Create Resume</h2>
+          {/* MY RESUMES */}
+          <button
+            onClick={() => navigate("/app/my-resumes")}
+            className="bg-white border border-slate-200 rounded-2xl h-60 flex flex-col items-center justify-center gap-4 shadow-sm hover:shadow-xl hover:-translate-y-1 transition"
+          >
+            <FilePenLineIcon className="size-14 text-green-600" />
+            <p className="font-semibold text-lg">My Resumes</p>
+          </button>
 
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Resume Title"
-              className="border w-full p-3 rounded"
-              required
-            />
+        </div>
 
-            <button className="w-full mt-4 bg-indigo-600 text-white p-3 rounded">
-              Create
-            </button>
+        {/* CREATE MODAL */}
+        {showCreateResume && (
+          <form
+            onSubmit={createResume}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center"
+          >
+            <div className="bg-white w-[400px] p-6 rounded-xl relative">
+              <h2 className="text-xl font-bold mb-4">Create Resume</h2>
 
-            <XIcon
-              className="absolute top-4 right-4 cursor-pointer"
-              onClick={() => setShowCreateResume(false)}
-            />
-          </div>
-        </form>
-      )}
+              <input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Resume Title"
+                className="border w-full p-3 rounded"
+                required
+              />
 
-      {/* Upload Modal */}
+              <button className="w-full mt-4 bg-indigo-600 text-white p-3 rounded">
+                Create
+              </button>
 
-      {showUploadResume && (
-        <form
-          onSubmit={uploadResume}
-          className="fixed inset-0 bg-black/60 flex justify-center items-center"
-        >
-          <div className="bg-white p-6 rounded-xl w-[450px] relative">
-            <h2 className="text-xl font-bold mb-4">Upload Resume</h2>
+              <XIcon
+                className="absolute top-4 right-4 cursor-pointer"
+                onClick={() => setShowCreateResume(false)}
+              />
+            </div>
+          </form>
+        )}
 
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Resume Title"
-              className="border w-full p-3 rounded mb-4"
-              required
-            />
+        {/* UPLOAD MODAL */}
+        {showUploadResume && (
+          <form
+            onSubmit={uploadResume}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center"
+          >
+            <div className="bg-white w-[450px] p-6 rounded-xl relative">
 
-            <label htmlFor="resume">
-              <div className="border-2 border-dashed rounded-xl p-10 text-center cursor-pointer">
-                <UploadCloud className="mx-auto mb-3" />
-                {resume ? resume.name : "Choose PDF Resume"}
-              </div>
-            </label>
+              <h2 className="text-xl font-bold mb-4">Upload Resume</h2>
 
-            <input
-              id="resume"
-              hidden
-              type="file"
-              accept=".pdf"
-              onChange={(e) => setResume(e.target.files[0])}
-            />
+              <input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Resume Title"
+                className="border w-full p-3 rounded mb-4"
+                required
+              />
 
-            <button className="w-full mt-4 bg-green-600 text-white p-3 rounded flex justify-center items-center gap-2">
-              {isLoading && <LoaderCircleIcon className="animate-spin" />}
-              {isLoading ? "Uploading..." : "Upload Resume"}
-            </button>
+              <label htmlFor="resume">
+                <div className="border-2 border-dashed rounded-xl p-8 text-center cursor-pointer hover:bg-slate-50">
+                  <UploadCloud className="mx-auto mb-2" />
+                  {resume ? resume.name : "Choose PDF Resume"}
+                </div>
+              </label>
 
-            <XIcon
-              className="absolute top-4 right-4 cursor-pointer"
-              onClick={() => setShowUploadResume(false)}
-            />
-          </div>
-        </form>
-      )}
+              <input
+                id="resume"
+                hidden
+                type="file"
+                accept=".pdf"
+                onChange={(e) => setResume(e.target.files[0])}
+              />
 
-      {/* Information Section */}
-      <div className="mt-16">
-        <div className="bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 rounded-3xl p-8 md:p-12 text-white overflow-hidden relative">
-          {/* Decorative Blobs */}
-          <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
+              <button className="w-full mt-4 bg-indigo-600 text-white p-3 rounded flex items-center justify-center gap-2">
+                {isLoading && <LoaderCircleIcon className="animate-spin" />}
+                {isLoading ? "Uploading..." : "Upload Resume"}
+              </button>
 
-          <div className="relative z-10">
-            {/* Badge */}
-            <span className="inline-block px-4 py-2 rounded-full bg-white/20 text-sm font-medium">
-              AI Powered Resume Builder
-            </span>
+              <XIcon
+                className="absolute top-4 right-4 cursor-pointer"
+                onClick={() => setShowUploadResume(false)}
+              />
+            </div>
+          </form>
+        )}
 
-            {/* Heading */}
-            <h2 className="mt-6 text-3xl md:text-5xl font-bold max-w-3xl">
-              Create Professional Resumes That Get Interviews
-            </h2>
+        {/* INFO SECTION (CLEANED) */}
+        <div className="mt-16 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl p-10 text-white">
 
-            {/* Description */}
-            <p className="mt-5 text-indigo-100 text-lg max-w-2xl">
-              Build ATS-friendly resumes, upload your existing resume for AI
-              improvements, and manage all your resumes from a single dashboard.
-            </p>
+          <h2 className="text-3xl font-bold">
+            Build ATS Friendly Resumes with AI
+          </h2>
 
-            {/* Feature Cards */}
-            <div className="grid md:grid-cols-3 gap-6 mt-10">
-              <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/10">
-                <h3 className="text-3xl font-bold">ATS</h3>
-                <p className="mt-2 text-indigo-100">
-                  Resume templates optimized for Applicant Tracking Systems.
-                </p>
-              </div>
+          <p className="mt-3 text-indigo-100 max-w-2xl">
+            Create professional resumes, improve them with AI suggestions,
+            and download instantly in PDF format.
+          </p>
 
-              <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/10">
-                <h3 className="text-3xl font-bold">AI</h3>
-                <p className="mt-2 text-indigo-100">
-                  Smart suggestions to improve resume content instantly.
-                </p>
-              </div>
+          <div className="grid md:grid-cols-3 gap-6 mt-8">
 
-              <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/10">
-                <h3 className="text-3xl font-bold">PDF</h3>
-                <p className="mt-2 text-indigo-100">
-                  Download clean and professional resumes with one click.
-                </p>
-              </div>
+            <div className="bg-white/10 p-5 rounded-xl">
+              <h3 className="font-bold text-xl">ATS</h3>
+              <p className="text-indigo-100 mt-2 text-sm">
+                Optimized templates for recruiters
+              </p>
             </div>
 
-            {/* Divider */}
-            <div className="mt-10 h-px bg-white/20 max-w-2xl mx-auto" />
+            <div className="bg-white/10 p-5 rounded-xl">
+              <h3 className="font-bold text-xl">AI</h3>
+              <p className="text-indigo-100 mt-2 text-sm">
+                Smart resume improvements
+              </p>
+            </div>
 
-            {/* Modern Informative Text */}
-            <p className="mt-10 text-center text-indigo-100 text-base md:text-lg max-w-3xl mx-auto leading-relaxed">
-              Whether you're a fresher or an experienced professional, our AI
-              helps you craft resumes that highlight your strengths, improve
-              readability, and increase your chances of getting shortlisted by
-              top companies.
-            </p>
+            <div className="bg-white/10 p-5 rounded-xl">
+              <h3 className="font-bold text-xl">PDF</h3>
+              <p className="text-indigo-100 mt-2 text-sm">
+                One-click download
+              </p>
+            </div>
+
           </div>
+
         </div>
+
       </div>
     </div>
   );
